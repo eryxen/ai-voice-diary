@@ -13,8 +13,8 @@
     body {
       font-family: 'Press Start 2P', monospace;
       font-size: 10px;
-      background: #F0F4F8;
-      color: #2D3748;
+      background: #FDE8E8;
+      color: #4A3728;
       image-rendering: pixelated;
       min-height: 100vh;
     }
@@ -23,46 +23,46 @@
 
     /* Pokémon RSE Panel */
     .panel {
-      background: #fff;
-      border: 3px solid #374151;
+      background: #FFF5F0;
+      border: 3px solid #C9A8E8;
       border-radius: 12px;
-      box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.25);
+      box-shadow: 4px 4px 0px 0px rgba(180,140,210,0.3);
       position: relative;
     }
     .panel::before {
       content: '';
       position: absolute;
       inset: 3px;
-      border: 2px solid rgba(59,130,246,0.3);
+      border: 2px solid rgba(200,170,230,0.4);
       border-radius: 8px;
       pointer-events: none;
     }
 
     /* Header */
     .header {
-      background: #1E3A5F;
+      background: linear-gradient(135deg, #A78BFA, #F9A8D4);
       color: white;
       text-align: center;
       padding: 12px;
       margin-bottom: 20px;
     }
     .header h1 { font-size: 12px; }
-    .header p { font-size: 7px; margin-top: 6px; color: #93C5FD; }
+    .header p { font-size: 7px; margin-top: 6px; color: #FDE8E8; }
 
     /* Recorder */
     .recorder { padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 20px; }
 
     .rec-btn {
       width: 80px; height: 80px; border-radius: 50%;
-      border: 4px solid #374151; background: #fff;
-      box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.25);
+      border: 4px solid #C9A8E8; background: #FFF5F0;
+      box-shadow: 4px 4px 0px 0px rgba(180,140,210,0.3);
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .rec-btn:hover { background: #3B82F6; border-color: #1E3A5F; }
-    .rec-btn:hover svg { fill: white; }
+    .rec-btn:hover { background: #E9D5FF; border-color: #A78BFA; }
+    .rec-btn:hover svg { fill: #7C3AED; }
     .rec-btn:active { box-shadow: none; transform: translate(2px, 2px); }
-    .rec-btn svg { width: 32px; height: 32px; fill: #374151; transition: fill 0.15s; }
+    .rec-btn svg { width: 32px; height: 32px; fill: #A78BFA; transition: fill 0.15s; }
 
     .rec-btn.recording {
       background: #EF4444; border-color: #B91C1C;
@@ -77,38 +77,38 @@
     .rec-status .time { font-size: 11px; }
 
     /* HP Bar */
-    .hp-bar { height: 12px; border-radius: 999px; overflow: hidden; background: #E5E7EB; border: 2px solid #374151; margin-top: 8px; width: 200px; }
+    .hp-bar { height: 12px; border-radius: 999px; overflow: hidden; background: #F3E8FF; border: 2px solid #C9A8E8; margin-top: 8px; width: 200px; }
     .hp-fill { height: 100%; border-radius: 999px; transition: width 0.5s; }
     .hp-fill.red { background: #EF4444; }
     .hp-fill.blue { background: #3B82F6; }
 
     /* Buttons */
     .btn {
-      background: #fff; border: 3px solid #374151; border-radius: 12px;
-      box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.25);
+      background: #FFF5F0; border: 3px solid #C9A8E8; border-radius: 12px;
+      box-shadow: 2px 2px 0px 0px rgba(180,140,210,0.3);
       padding: 10px 16px; font-family: 'Press Start 2P', monospace; font-size: 10px;
-      cursor: pointer; transition: all 0.1s;
+      cursor: pointer; transition: all 0.1s; color: #4A3728;
     }
-    .btn:hover { background: #3B82F6; color: white; border-color: #1E3A5F; }
+    .btn:hover { background: #E9D5FF; color: #7C3AED; border-color: #A78BFA; }
     .btn:active { box-shadow: none; transform: translate(2px, 2px); }
-    .btn-danger { background: #EF4444; color: white; border-color: #B91C1C; }
-    .btn-danger:hover { background: #DC2626; }
+    .btn-danger { background: #FECACA; color: #B91C1C; border-color: #F9A8D4; }
+    .btn-danger:hover { background: #FCA5A5; }
 
     /* Diary List */
     .list-header { font-size: 9px; color: #9CA3AF; margin-bottom: 8px; padding-left: 4px; }
 
     .diary-item {
       width: 100%; text-align: left; padding: 12px; cursor: pointer;
-      background: #fff; border: 3px solid #374151; border-radius: 12px;
-      box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.25);
+      background: #FFF5F0; border: 3px solid #C9A8E8; border-radius: 12px;
+      box-shadow: 4px 4px 0px 0px rgba(180,140,210,0.3);
       margin-bottom: 12px; transition: background 0.15s; position: relative;
       font-family: 'Press Start 2P', monospace;
     }
     .diary-item::before {
       content: ''; position: absolute; inset: 3px;
-      border: 2px solid rgba(59,130,246,0.3); border-radius: 8px; pointer-events: none;
+      border: 2px solid rgba(200,170,230,0.4); border-radius: 8px; pointer-events: none;
     }
-    .diary-item:hover { background: #EFF6FF; }
+    .diary-item:hover { background: #F3E8FF; }
 
     .diary-item .row { display: flex; justify-content: space-between; align-items: flex-start; }
     .diary-item .title-area { display: flex; align-items: center; gap: 8px; }
@@ -116,7 +116,7 @@
     .diary-item .title { font-size: 10px; line-height: 1.4; }
     .diary-item .date { font-size: 8px; color: #9CA3AF; flex-shrink: 0; margin-left: 8px; }
     .diary-item .tags { margin-top: 8px; margin-left: 22px; display: flex; gap: 6px; }
-    .diary-item .tag { font-size: 7px; color: #3B82F6; }
+    .diary-item .tag { font-size: 7px; color: #A78BFA; }
 
     /* Detail View */
     .detail { animation: fadeIn 0.3s; }
@@ -132,14 +132,14 @@
     }
 
     .detail-section { padding: 12px; margin-bottom: 12px; }
-    .detail-section .label { font-size: 9px; color: #3B82F6; margin-bottom: 8px; }
+    .detail-section .label { font-size: 9px; color: #A78BFA; margin-bottom: 8px; }
     .detail-section.todo .label { color: #EF4444; }
     .detail-section .item { font-size: 10px; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
     .detail-section .star { color: #FACC15; }
     .detail-section .box { color: #EF4444; }
 
     .detail-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .detail-tag { padding: 4px 8px; font-size: 8px; color: #3B82F6; }
+    .detail-tag { padding: 4px 8px; font-size: 8px; color: #A78BFA; }
 
     .transcript-toggle { padding: 12px; cursor: pointer; margin-bottom: 16px; }
     .transcript-toggle summary { font-size: 9px; color: #9CA3AF; }
@@ -148,11 +148,11 @@
     .detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
     /* Mood colors */
-    .mood-happy { background: #FEF9C3; border-color: #FACC15; }
-    .mood-neutral { background: #EFF6FF; border-color: #93C5FD; }
-    .mood-sad { background: #DBEAFE; border-color: #60A5FA; }
-    .mood-anxious { background: #FEF2F2; border-color: #FCA5A5; }
-    .mood-excited { background: #F0FDF4; border-color: #86EFAC; }
+    .mood-happy { background: #FEF9C3; border-color: #FDE68A; }
+    .mood-neutral { background: #F3E8FF; border-color: #C9A8E8; }
+    .mood-sad { background: #DBEAFE; border-color: #93C5FD; }
+    .mood-anxious { background: #FECACA; border-color: #F9A8D4; }
+    .mood-excited { background: #D1FAE5; border-color: #6EE7B7; }
 
     /* Processing */
     .processing { text-align: center; padding: 48px 16px; animation: fadeIn 0.3s; }
