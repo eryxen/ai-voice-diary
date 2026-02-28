@@ -2,6 +2,8 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from .database import init_db
 from .routes import router
 
@@ -30,3 +32,13 @@ async def startup():
 @app.get("/health")
 async def health():
     return {"status": "ok", "version": "0.1.0"}
+
+
+# Serve static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Root → serve index.html
+@app.get("/")
+async def root():
+    return FileResponse("static/index.html")

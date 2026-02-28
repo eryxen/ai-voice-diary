@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎙️ AI Voice Diary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#1E3A5F">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      background: #F0F4F8;
+      color: #2D3748;
+      image-rendering: pixelated;
+      min-height: 100vh;
+    }
+
+    .app { max-width: 420px; margin: 0 auto; padding: 16px 16px 32px; }
+
+    /* Pokémon RSE Panel */
+    .panel {
+      background: #fff;
+      border: 3px solid #374151;
+      border-radius: 12px;
+      box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.25);
+      position: relative;
+    }
+    .panel::before {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 2px solid rgba(59,130,246,0.3);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    /* Header */
+    .header {
+      background: #1E3A5F;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    .header h1 { font-size: 12px; }
+    .header p { font-size: 7px; margin-top: 6px; color: #93C5FD; }
+
+    /* Recorder */
+    .recorder { padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 20px; }
+
+    .rec-btn {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 4px solid #374151; background: #fff;
+      box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.25);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .rec-btn:hover { background: #3B82F6; border-color: #1E3A5F; }
+    .rec-btn:hover svg { fill: white; }
+    .rec-btn:active { box-shadow: none; transform: translate(2px, 2px); }
+    .rec-btn svg { width: 32px; height: 32px; fill: #374151; transition: fill 0.15s; }
+
+    .rec-btn.recording {
+      background: #EF4444; border-color: #B91C1C;
+      animation: pulse-rec 1.5s ease-in-out infinite;
+    }
+    .rec-btn.recording .stop-icon { width: 24px; height: 24px; background: white; border-radius: 3px; }
+
+    .rec-hint { font-size: 9px; color: #9CA3AF; }
+
+    .rec-status { text-align: center; animation: fadeIn 0.3s; }
+    .rec-status .dot { display: inline-block; width: 10px; height: 10px; background: #EF4444; border-radius: 50%; animation: pulse-rec 1.5s ease-in-out infinite; vertical-align: middle; margin-right: 8px; }
+    .rec-status .time { font-size: 11px; }
+
+    /* HP Bar */
+    .hp-bar { height: 12px; border-radius: 999px; overflow: hidden; background: #E5E7EB; border: 2px solid #374151; margin-top: 8px; width: 200px; }
+    .hp-fill { height: 100%; border-radius: 999px; transition: width 0.5s; }
+    .hp-fill.red { background: #EF4444; }
+    .hp-fill.blue { background: #3B82F6; }
+
+    /* Buttons */
+    .btn {
+      background: #fff; border: 3px solid #374151; border-radius: 12px;
+      box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.25);
+      padding: 10px 16px; font-family: 'Press Start 2P', monospace; font-size: 10px;
+      cursor: pointer; transition: all 0.1s;
+    }
+    .btn:hover { background: #3B82F6; color: white; border-color: #1E3A5F; }
+    .btn:active { box-shadow: none; transform: translate(2px, 2px); }
+    .btn-danger { background: #EF4444; color: white; border-color: #B91C1C; }
+    .btn-danger:hover { background: #DC2626; }
+
+    /* Diary List */
+    .list-header { font-size: 9px; color: #9CA3AF; margin-bottom: 8px; padding-left: 4px; }
+
+    .diary-item {
+      width: 100%; text-align: left; padding: 12px; cursor: pointer;
+      background: #fff; border: 3px solid #374151; border-radius: 12px;
+      box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.25);
+      margin-bottom: 12px; transition: background 0.15s; position: relative;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .diary-item::before {
+      content: ''; position: absolute; inset: 3px;
+      border: 2px solid rgba(59,130,246,0.3); border-radius: 8px; pointer-events: none;
+    }
+    .diary-item:hover { background: #EFF6FF; }
+
+    .diary-item .row { display: flex; justify-content: space-between; align-items: flex-start; }
+    .diary-item .title-area { display: flex; align-items: center; gap: 8px; }
+    .diary-item .emoji { font-size: 14px; }
+    .diary-item .title { font-size: 10px; line-height: 1.4; }
+    .diary-item .date { font-size: 8px; color: #9CA3AF; flex-shrink: 0; margin-left: 8px; }
+    .diary-item .tags { margin-top: 8px; margin-left: 22px; display: flex; gap: 6px; }
+    .diary-item .tag { font-size: 7px; color: #3B82F6; }
+
+    /* Detail View */
+    .detail { animation: fadeIn 0.3s; }
+    .detail-header { padding: 16px; }
+    .detail-header h2 { font-size: 12px; line-height: 1.5; }
+    .detail-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .detail-meta .emoji { font-size: 16px; }
+    .detail-meta span { font-size: 9px; color: #6B7280; }
+
+    .detail-content {
+      padding: 16px; font-size: 10px; line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .detail-section { padding: 12px; margin-bottom: 12px; }
+    .detail-section .label { font-size: 9px; color: #3B82F6; margin-bottom: 8px; }
+    .detail-section.todo .label { color: #EF4444; }
+    .detail-section .item { font-size: 10px; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+    .detail-section .star { color: #FACC15; }
+    .detail-section .box { color: #EF4444; }
+
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .detail-tag { padding: 4px 8px; font-size: 8px; color: #3B82F6; }
+
+    .transcript-toggle { padding: 12px; cursor: pointer; margin-bottom: 16px; }
+    .transcript-toggle summary { font-size: 9px; color: #9CA3AF; }
+    .transcript-toggle p { margin-top: 8px; font-size: 9px; color: #6B7280; line-height: 1.6; }
+
+    .detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Mood colors */
+    .mood-happy { background: #FEF9C3; border-color: #FACC15; }
+    .mood-neutral { background: #EFF6FF; border-color: #93C5FD; }
+    .mood-sad { background: #DBEAFE; border-color: #60A5FA; }
+    .mood-anxious { background: #FEF2F2; border-color: #FCA5A5; }
+    .mood-excited { background: #F0FDF4; border-color: #86EFAC; }
+
+    /* Processing */
+    .processing { text-align: center; padding: 48px 16px; animation: fadeIn 0.3s; }
+    .spinner {
+      display: inline-block; width: 32px; height: 32px;
+      border: 3px solid #3B82F6; border-top-color: transparent;
+      border-radius: 50%; animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    .processing p { font-size: 10px; }
+
+    /* Error */
+    .error-bar {
+      padding: 12px; margin-bottom: 16px; background: #FEF2F2;
+      display: flex; justify-content: space-between; align-items: center;
+      animation: fadeIn 0.3s;
+    }
+    .error-bar span { font-size: 9px; color: #EF4444; }
+    .error-bar button { font-size: 9px; color: #9CA3AF; background: none; border: none; cursor: pointer; font-family: 'Press Start 2P'; }
+
+    /* Empty */
+    .empty { text-align: center; padding: 32px; }
+    .empty p { font-size: 11px; color: #9CA3AF; }
+    .empty .sub { font-size: 9px; color: #D1D5DB; margin-top: 8px; }
+
+    /* Animations */
+    @keyframes pulse-rec { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(1.1); } }
+    @keyframes fadeIn { 0% { opacity:0; transform:translateY(8px); } 100% { opacity:1; transform:translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+
+  <script>
+    const API = '';  // same origin
+    const MOOD_EMOJI = { happy:'😊', neutral:'😐', sad:'😢', anxious:'😰', excited:'🤩' };
+
+    let state = { view: 'home', diaries: [], selected: null, recording: false, duration: 0, error: '', processing: '' };
+    let mediaRecorder = null;
+    let chunks = [];
+    let timer = null;
+
+    // --- API ---
+    async function apiCreate(blob) {
+      const fd = new FormData();
+      fd.append('audio', blob, 'recording.webm');
+      const r = await fetch(API + '/api/diary/create', { method: 'POST', body: fd });
+      if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || 'Failed'); }
+      return r.json();
+    }
+    async function apiList() {
+      const r = await fetch(API + '/api/diary/list?limit=50');
+      if (!r.ok) throw new Error('Load failed');
+      return r.json();
+    }
+    async function apiGet(id) {
+      const r = await fetch(API + '/api/diary/' + id);
+      if (!r.ok) throw new Error('Not found');
+      return r.json();
+    }
+    async function apiDelete(id) {
+      const r = await fetch(API + '/api/diary/' + id, { method: 'DELETE' });
+      if (!r.ok) throw new Error('Delete failed');
+    }
+
+    // --- Recording ---
+    async function startRec() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mr = new MediaRecorder(stream, {
+          mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'
+        });
+        chunks = [];
+        mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+        mr.onstop = () => {
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          stream.getTracks().forEach(t => t.stop());
+          handleBlob(blob);
+        };
+        mr.start();
+        mediaRecorder = mr;
+        state.recording = true;
+        state.duration = 0;
+        timer = setInterval(() => { state.duration++; render(); }, 1000);
+        render();
+      } catch (e) {
+        state.error = '无法访问麦克风';
+        render();
+      }
+    }
+
+    function stopRec() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        state.recording = false;
+        if (timer) clearInterval(timer);
+        render();
+      }
+    }
+
+    async function handleBlob(blob) {
+      state.view = 'processing';
+      state.processing = '🎙️ 正在转录语音...';
+      render();
+      try {
+        state.processing = '🧠 AI 正在整理日记...';
+        render();
+        const diary = await apiCreate(blob);
+        state.selected = diary;
+        state.view = 'detail';
+        loadList();
+      } catch (e) {
+        state.error = e.message;
+        state.view = 'home';
+      }
+      render();
+    }
+
+    async function loadList() {
+      try { const d = await apiList(); state.diaries = d.items; render(); } catch {}
+    }
+
+    async function selectDiary(id) {
+      try {
+        state.selected = await apiGet(id);
+        state.view = 'detail';
+      } catch { state.error = '无法加载日记'; }
+      render();
+    }
+
+    async function deleteDiary(id) {
+      if (!confirm('确定删除这篇日记吗？')) return;
+      try {
+        await apiDelete(id);
+        state.view = 'home';
+        state.selected = null;
+        loadList();
+      } catch { state.error = '删除失败'; }
+      render();
+    }
+
+    // --- Render ---
+    function fmt(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+    function fmtDate(d) { return new Date(d).toLocaleDateString('zh-CN', { month:'short', day:'numeric' }); }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function render() {
+      const $ = document.getElementById('app');
+      let h = '';
+
+      // Header
+      h += '<div class="panel header"><h1>🎙️ VOICE DIARY</h1><p>speak your thoughts</p></div>';
+
+      // Error
+      if (state.error) {
+        h += `<div class="panel error-bar"><span>${esc(state.error)}</span><button onclick="state.error='';render()">✕</button></div>`;
+      }
+
+      if (state.view === 'processing') {
+        h += `<div class="panel processing"><div class="spinner"></div><p>${esc(state.processing)}</p>
+          <div class="hp-bar" style="margin:16px auto 0;"><div class="hp-fill blue" style="width:66%;animation:pulse-rec 2s infinite"></div></div></div>`;
+
+      } else if (state.view === 'home') {
+        // Recorder
+        h += '<div class="panel recorder">';
+        if (state.recording) {
+          h += `<div class="rec-status"><span class="dot"></span><span class="time">REC ${fmt(state.duration)}</span>
+            <div class="hp-bar"><div class="hp-fill red" style="width:${Math.min(state.duration/300*100,100)}%"></div></div></div>`;
+        }
+        h += `<button class="rec-btn ${state.recording?'recording':''}" onclick="${state.recording?'stopRec()':'startRec()'}">`;
+        if (state.recording) {
+          h += '<div class="stop-icon"></div>';
+        } else {
+          h += '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+        }
+        h += '</button>';
+        h += `<span class="rec-hint">${state.recording?'点击停止':'点击录音'}</span>`;
+        h += '</div>';
+
+        // List
+        h += `<div class="list-header">▸ DIARY LOG (${state.diaries.length})</div>`;
+        if (state.diaries.length === 0) {
+          h += '<div class="panel empty"><p>还没有日记</p><p class="sub">点击上方按钮开始录音</p></div>';
+        } else {
+          state.diaries.forEach(d => {
+            const emoji = MOOD_EMOJI[d.mood] || '😐';
+            h += `<button class="diary-item" onclick="selectDiary('${d.id}')">
+              <div class="row"><div class="title-area"><span class="emoji">${emoji}</span><span class="title">${esc(d.title)}</span></div>
+              <span class="date">${fmtDate(d.created_at)}</span></div>`;
+            if (d.tags && d.tags.length) {
+              h += '<div class="tags">' + d.tags.slice(0,3).map(t => `<span class="tag">#${esc(t)}</span>`).join('') + '</div>';
+            }
+            h += '</button>';
+          });
+        }
+
+      } else if (state.view === 'detail' && state.selected) {
+        const d = state.selected;
+        const emoji = MOOD_EMOJI[d.mood] || '😐';
+        const mc = 'mood-' + d.mood;
+
+        h += '<div class="detail">';
+        // Header
+        h += `<div class="panel detail-header ${mc}"><h2>${esc(d.title)}</h2>
+          <div class="detail-meta"><span class="emoji">${emoji}</span><span>${d.mood.toUpperCase()}</span>`;
+        if (d.duration_sec) h += `<span>${fmt(Math.floor(d.duration_sec))}</span>`;
+        h += `<span style="margin-left:auto;font-size:8px;color:#9CA3AF">${new Date(d.created_at).toLocaleDateString('zh-CN')}</span>`;
+        h += '</div></div>';
+
+        // Content
+        h += `<div class="panel detail-content" style="margin-top:12px">${esc(d.content)}</div>`;
+
+        // Key events
+        if (d.key_events && d.key_events.length) {
+          h += '<div class="panel detail-section" style="margin-top:12px"><div class="label">▸ KEY EVENTS</div>';
+          d.key_events.forEach(e => { h += `<div class="item"><span class="star">★</span><span>${esc(e)}</span></div>`; });
+          h += '</div>';
+        }
+
+        // Todos
+        if (d.todos && d.todos.length) {
+          h += '<div class="panel detail-section todo" style="margin-top:12px"><div class="label">▸ TODO</div>';
+          d.todos.forEach(t => { h += `<div class="item"><span class="box">□</span><span>${esc(t)}</span></div>`; });
+          h += '</div>';
+        }
+
+        // Tags
+        if (d.tags && d.tags.length) {
+          h += '<div class="detail-tags" style="margin-top:12px">';
+          d.tags.forEach(t => { h += `<span class="panel detail-tag">#${esc(t)}</span>`; });
+          h += '</div>';
+        }
+
+        // Transcript
+        h += `<details class="panel transcript-toggle" style="margin-top:12px"><summary>▸ 原始转录</summary><p>${esc(d.transcript)}</p></details>`;
+
+        // Actions
+        h += `<div class="detail-actions">
+          <button class="btn" onclick="state.view='home';state.selected=null;render()">← BACK</button>
+          <button class="btn btn-danger" onclick="deleteDiary('${d.id}')">DELETE</button></div>`;
+        h += '</div>';
+      }
+
+      $.innerHTML = h;
+    }
+
+    // Init
+    loadList();
+    render();
+  </script>
+</body>
+</html>
