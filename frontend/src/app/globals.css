@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-poke-bg font-pixel text-poke-textbox;
+    font-size: 10px;
+    image-rendering: pixelated;
+  }
+}
+
+@layer components {
+  /* Pokémon RSE style panel */
+  .poke-panel {
+    @apply bg-poke-panel border-[3px] border-poke-border rounded-pixel shadow-pixel;
+    position: relative;
+  }
+
+  .poke-panel::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+
+  /* Battle-style button */
+  .poke-btn {
+    @apply bg-poke-panel border-[3px] border-poke-border rounded-pixel shadow-pixel-sm 
+           px-4 py-3 font-pixel text-[10px] cursor-pointer
+           hover:bg-poke-blue hover:text-white hover:border-poke-darkblue
+           active:shadow-none active:translate-x-[2px] active:translate-y-[2px]
+           transition-all duration-100;
+  }
+
+  .poke-btn-primary {
+    @apply poke-btn bg-poke-blue text-white border-poke-darkblue
+           hover:bg-blue-600;
+  }
+
+  .poke-btn-danger {
+    @apply poke-btn bg-poke-red text-white border-red-700
+           hover:bg-red-600;
+  }
+
+  /* HP bar style progress */
+  .hp-bar {
+    @apply h-3 rounded-full overflow-hidden bg-gray-200 border-2 border-poke-border;
+  }
+
+  .hp-bar-fill {
+    @apply h-full rounded-full transition-all duration-500;
+  }
+
+  /* Mood colors */
+  .mood-happy { @apply text-poke-yellow; }
+  .mood-neutral { @apply text-poke-blue; }
+  .mood-sad { @apply text-blue-400; }
+  .mood-anxious { @apply text-poke-red; }
+  .mood-excited { @apply text-poke-green; }
+
+  /* Text box - like dialog box */
+  .poke-textbox {
+    @apply poke-panel p-4 text-[10px] leading-relaxed;
+  }
+
+  /* Recording pulse */
+  @keyframes pulse-record {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+  }
+
+  .recording-pulse {
+    animation: pulse-record 1.5s ease-in-out infinite;
+  }
+
+  /* Pixel fade in */
+  @keyframes pixel-in {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .pixel-fade-in {
+    animation: pixel-in 0.3s ease-out;
+  }
+}
